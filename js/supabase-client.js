@@ -1,23 +1,54 @@
 /**
  * DRIP081 - Cliente de Integração com o Supabase
  * Gerencia a comunicação em tempo real com o banco de dados PostgreSQL do Supabase.
+ * Suporta tanto as credenciais locais quanto Environment Variables da Vercel (/api/config).
  */
 
-const SUPABASE_URL = "https://fysmydnbpmtxheyvpkmi.supabase.co";
-const SUPABASE_KEY = "sb_publishable_r5BEVBjWaCi7z68plQn2HQ_scSiAEoc";
+let SUPABASE_URL = "https://fysmydnbpmtxheyvpkmi.supabase.co";
+let SUPABASE_KEY = "sb_publishable_r5BEVBjWaCi7z68plQn2HQ_scSiAEoc";
 
 let supabaseClient = null;
+let initPromise = null;
 
-if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
-  try {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("[DRIP081] Supabase inicializado com sucesso.");
-  } catch (err) {
-    console.error("[DRIP081] Falha ao inicializar o cliente Supabase:", err);
-  }
-} else {
-  console.warn("[DRIP081] Biblioteca @supabase/supabase-js não encontrada.");
+async function ensureSupabaseClient() {
+  if (supabaseClient) return supabaseClient;
+  if (initPromise) return initPromise;
+
+  initPromise = (async () => {
+    // 1. Tenta buscar das variáveis de ambiente da Vercel (se estiver hospedado lá)
+    try {
+      const res = await fetch('/api/config');
+      if (res.ok) {
+        const config = await res.json();
+        if (config.supabaseUrl && config.supabaseKey) {
+          SUPABASE_URL = config.supabaseUrl;
+          SUPABASE_KEY = config.supabaseKey;
+        }
+      }
+    } catch (e) {
+      // Ambiente local ou offline, utiliza as credenciais padrão
+    }
+
+    // 2. Inicializa o cliente do Supabase
+    if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+      try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log("[DRIP081] Supabase conectado com sucesso.");
+      } catch (err) {
+        console.error("[DRIP081] Falha ao inicializar o cliente Supabase:", err);
+      }
+    } else {
+      console.warn("[DRIP081] Biblioteca @supabase/supabase-js não encontrada.");
+    }
+
+    return supabaseClient;
+  })();
+
+  return initPromise;
 }
+
+// Inicialização imediata em segundo plano
+ensureSupabaseClient();
 
 /* ==========================================================================
    CRUD: PRODUTOS
@@ -27,13 +58,14 @@ if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClien
  * Busca todos os produtos cadastrados no Supabase
  */
 async function fetchSupabaseProducts() {
-  if (!supabaseClient) {
+  const client = await ensureSupabaseClient();
+  if (!client) {
     console.warn("[DRIP081] Supabase não conectado. Usando dados locais como fallback.");
     return null;
   }
 
   try {
-    const { data, error } = await supabaseClient
+    const { data, error } = await client
       .from('produtos')
       .select('*')
       .order('created_at', { ascending: false });
@@ -54,11 +86,12 @@ async function fetchSupabaseProducts() {
  * Cria um novo produto
  */
 async function insertSupabaseProduct(productData) {
-  if (!supabaseClient) {
+  const client = await ensureSupabaseClient();
+  if (!client) {
     throw new Error("Cliente Supabase não está conectado.");
   }
 
-  const { data, error } = await supabaseClient
+  const { data, error } = await client
     .from('produtos')
     .insert([productData])
     .select();
@@ -71,11 +104,12 @@ async function insertSupabaseProduct(productData) {
  * Atualiza um produto existente
  */
 async function updateSupabaseProduct(productId, productData) {
-  if (!supabaseClient) {
+  const client = await ensureSupabaseClient();
+  if (!client) {
     throw new Error("Cliente Supabase não está conectado.");
   }
 
-  const { data, error } = await supabaseClient
+  const { data, error } = await client
     .from('produtos')
     .update(productData)
     .eq('id', productId)
@@ -89,11 +123,12 @@ async function updateSupabaseProduct(productId, productData) {
  * Exclui um produto
  */
 async function deleteSupabaseProduct(productId) {
-  if (!supabaseClient) {
+  const client = await ensureSupabaseClient();
+  if (!client) {
     throw new Error("Cliente Supabase não está conectado.");
   }
 
-  const { data, error } = await supabaseClient
+  const { data, error } = await client
     .from('produtos')
     .delete()
     .eq('id', productId);
@@ -110,10 +145,11 @@ async function deleteSupabaseProduct(productId) {
  * Busca todas as categorias cadastradas no Supabase
  */
 async function fetchSupabaseCategories() {
-  if (!supabaseClient) return null;
+  const client = await ensureSupabaseClient();
+  if (!client) return null;
 
   try {
-    const { data, error } = await supabaseClient
+    const { data, error } = await client
       .from('categorias')
       .select('*')
       .order('nome', { ascending: true });
@@ -134,11 +170,12 @@ async function fetchSupabaseCategories() {
  * Cria uma nova categoria
  */
 async function insertSupabaseCategory(categoryData) {
-  if (!supabaseClient) {
+  const client = await ensureSupabaseClient();
+  if (!client) {
     throw new Error("Cliente Supabase não está conectado.");
   }
 
-  const { data, error } = await supabaseClient
+  const { data, error } = await client
     .from('categorias')
     .insert([categoryData])
     .select();
@@ -151,11 +188,12 @@ async function insertSupabaseCategory(categoryData) {
  * Atualiza uma categoria existente
  */
 async function updateSupabaseCategory(categoryId, categoryData) {
-  if (!supabaseClient) {
+  const client = await ensureSupabaseClient();
+  if (!client) {
     throw new Error("Cliente Supabase não está conectado.");
   }
 
-  const { data, error } = await supabaseClient
+  const { data, error } = await client
     .from('categorias')
     .update(categoryData)
     .eq('id', categoryId)
@@ -169,11 +207,12 @@ async function updateSupabaseCategory(categoryId, categoryData) {
  * Exclui uma categoria
  */
 async function deleteSupabaseCategory(categoryId) {
-  if (!supabaseClient) {
+  const client = await ensureSupabaseClient();
+  if (!client) {
     throw new Error("Cliente Supabase não está conectado.");
   }
 
-  const { data, error } = await supabaseClient
+  const { data, error } = await client
     .from('categorias')
     .delete()
     .eq('id', categoryId);
@@ -185,6 +224,7 @@ async function deleteSupabaseCategory(categoryId) {
 // Expõe helpers no objeto global da aplicação
 window.DRIP081_DB = {
   client: supabaseClient,
+  ensureClient: ensureSupabaseClient,
   // Produtos
   fetchProducts: fetchSupabaseProducts,
   insertProduct: insertSupabaseProduct,
