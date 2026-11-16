@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADMIN // DRIP081</title>
+  <meta name="description" content="Painel de controle, cadastro, edição e gerenciamento de produtos e categorias da DRIP081.">
+  
+  <!-- Favicon: Isotipo -->
+  <link rel="icon" type="image/png" href="assets/isotipo-black.png">
+  
+  <!-- CSS Principal -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-page">
+
+  <!-- CABEÇALHO EM PÍLULA FLUTUANTE -->
+  <header class="pill-header" role="banner">
+    <a href="index.html" class="pill-brand" aria-label="DRIP081 Início">
+      <img src="assets/imagotipo-white.png" alt="DRIP081" class="pill-logo">
+    </a>
+    <nav class="pill-nav" aria-label="Navegação administrativa">
+      <a href="webshop.html" class="pill-link">WEBSHOP</a>
+      <span class="admin-pill-tag">ADMIN</span>
+    </nav>
+  </header>
+
+  <main class="admin-wrapper" role="main">
+    <div class="admin-container">
+      
+      <!-- TÍTULO & STATUS -->
+      <div class="admin-header">
+        <div>
+          <h1 class="admin-title">PAINEL ADMINISTRATIVO</h1>
+          <p class="admin-subtitle">GERENCIADOR DE PRODUTOS &amp; CATEGORIAS // DRIP081 RECIFE</p>
+        </div>
+        <div class="db-status-badge" id="db-status-badge">
+          <span class="db-dot"></span>
+          <span id="db-status-text">CONECTANDO AO SUPABASE...</span>
+        </div>
+      </div>
+
+      <!-- ABAS PRINCIPAIS DO ADMIN: PRODUTOS vs CATEGORIAS -->
+      <div class="admin-nav-tabs">
+        <button type="button" class="admin-tab-btn active" data-tab="tab-products" id="tab-btn-products">
+          PRODUTOS (<span id="tab-prod-count">0</span>)
+        </button>
+        <button type="button" class="admin-tab-btn" data-tab="tab-categories" id="tab-btn-categories">
+          CATEGORIAS (<span id="tab-cat-count">0</span>)
+        </button>
+      </div>
+
+      <!-- AVISO SOBRE O BANCO DE DADOS -->
+      <div class="admin-notice" id="admin-notice" style="display: none;">
+        <div class="admin-notice-content">
+          <strong>AVISO:</strong> A tabela <code>produtos</code> ou <code>categorias</code> ainda não foi criada no seu Supabase.
+          Execute o script SQL fornecido no painel do Supabase para ativar a gravação.
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           SEÇÃO 1: ABA DE PRODUTOS
+           ================================================================== -->
+      <div class="admin-tab-content active" id="tab-products">
+        <div class="admin-grid">
+          
+          <!-- COLUNA 1: FORMULÁRIO DE PRODUTO (NOVO / EDITAR) -->
+          <section class="admin-card" aria-labelledby="form-heading">
+            <div class="form-title-bar">
+              <h2 class="admin-card-title" id="form-heading">+ NOVO PRODUTO</h2>
+              <button type="button" class="btn-cancel-edit" id="btn-cancel-edit" style="display: none;">
+                ✕ CANCELAR EDIÇÃO
+              </button>
+            </div>
+            
+            <form id="product-form" class="admin-form">
+              <input type="hidden" id="edit-prod-id" value="">
+              
+              <!-- Nome -->
+              <div class="form-group">
+                <label for="prod-name" class="form-label">NOME DA PEÇA *</label>
+                <input 
+                  type="text" 
+                  id="prod-name" 
+                  name="nome" 
+                  class="form-input" 
+                  placeholder="EX: HOODIE BOX CUT 081" 
+                  required 
+                  autocomplete="off"
+                >
+              </div>
+
+              <div class="form-row">
+                <!-- Categoria Dinâmica -->
+                <div class="form-group">
+                  <div class="form-label-row">
+                    <label for="prod-category" class="form-label">CATEGORIA *</label>
+                    <button type="button" class="link-manage-cats" id="link-goto-cats">GERENCIAR CATEGORIAS &rarr;</button>
+                  </div>
+                  <select id="prod-category" name="categoria" class="form-select" required>
+                    <!-- Preenchido dinamicamente via JS -->
+                  </select>
+                </div>
+
+                <!-- Preço -->
+                <div class="form-group">
+                  <label for="prod-price" class="form-label">PREÇO (R$) *</label>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    min="0" 
+                    id="prod-price" 
+                    name="preco" 
+                    class="form-input" 
+                    placeholder="EX: 389.00" 
+                    required
+                  >
+                </div>
+              </div>
+
+              <!-- Imagem Principal: 2 Opções (URL ou Uploader) -->
+              <div class="form-group">
+                <label class="form-label">IMAGEM PRINCIPAL *</label>
+                <div class="image-upload-widget" data-target="1">
+                  <div class="upload-mode-tabs">
+                    <button type="button" class="upload-tab-btn active" data-target="1" data-mode="url">1º OPÇÃO: POR URL</button>
+                    <button type="button" class="upload-tab-btn" data-target="1" data-mode="file">2º OPÇÃO: UPLOADER</button>
+                  </div>
+
+                  <!-- 1º Opção: URL -->
+                  <div class="upload-mode-panel mode-url active" id="panel-url-1">
+                    <input 
+                      type="text" 
+                      id="prod-image-url-1" 
+                      class="form-input input-image-url" 
+                      data-target="1"
+                      placeholder="Cole aqui o link da imagem (ex: https://...)" 
+                    >
+                  </div>
+
+                  <!-- 2º Opção: Uploader de Arquivo -->
+                  <div class="upload-mode-panel mode-file" id="panel-file-1">
+                    <div class="drop-zone" id="drop-zone-1" data-target="1">
+                      <input type="file" id="prod-image-file-1" class="file-input-hidden" data-target="1" accept="image/*">
+                      <div class="drop-zone-content">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span class="drop-zone-text">CLIQUE OU ARRASTE A FOTO AQUI</span>
+                        <span class="drop-zone-sub">PNG, JPG ou WEBP (Preenche o card)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Prévia da Imagem -->
+                  <div class="image-preview-box" id="preview-box-1" style="display: none;">
+                    <img src="" alt="Prévia da Foto" id="preview-img-1" class="preview-thumb">
+                    <button type="button" class="btn-remove-preview" data-target="1" title="Remover foto">&times;</button>
+                  </div>
+
+                  <!-- Input final com o valor -->
+                  <input type="hidden" id="prod-image" name="imagem" required>
+                </div>
+              </div>
+
+              <!-- 2ª Imagem: 2 Opções (URL ou Uploader - Opcional) -->
+              <div class="form-group">
+                <label class="form-label">2ª IMAGEM PARA HOVER (OPCIONAL)</label>
+                <div class="image-upload-widget" data-target="2">
+                  <div class="upload-mode-tabs">
+                    <button type="button" class="upload-tab-btn active" data-target="2" data-mode="url">1º OPÇÃO: POR URL</button>
+                    <button type="button" class="upload-tab-btn" data-target="2" data-mode="file">2º OPÇÃO: UPLOADER</button>
+                  </div>
+
+                  <!-- 1º Opção: URL -->
+                  <div class="upload-mode-panel mode-url active" id="panel-url-2">
+                    <input 
+                      type="text" 
+                      id="prod-image-url-2" 
+                      class="form-input input-image-url" 
+                      data-target="2"
+                      placeholder="Cole aqui o link da 2ª imagem (opcional)" 
+                    >
+                  </div>
+
+                  <!-- 2º Opção: Uploader de Arquivo -->
+                  <div class="upload-mode-panel mode-file" id="panel-file-2">
+                    <div class="drop-zone" id="drop-zone-2" data-target="2">
+                      <input type="file" id="prod-image-file-2" class="file-input-hidden" data-target="2" accept="image/*">
+                      <div class="drop-zone-content">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span class="drop-zone-text">CLIQUE OU ARRASTE A 2ª FOTO</span>
+                        <span class="drop-zone-sub">PNG, JPG ou WEBP</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Prévia da Imagem 2 -->
+                  <div class="image-preview-box" id="preview-box-2" style="display: none;">
+                    <img src="" alt="Prévia da 2ª Foto" id="preview-img-2" class="preview-thumb">
+                    <button type="button" class="btn-remove-preview" data-target="2" title="Remover foto">&times;</button>
+                  </div>
+
+                  <!-- Input final com o valor -->
+                  <input type="hidden" id="prod-image2" name="imagem2">
+                </div>
+              </div>
+
+              <!-- Tamanhos -->
+              <div class="form-group">
+                <span class="form-label">TAMANHOS DISPONÍVEIS *</span>
+                <div class="admin-sizes-picker" id="admin-sizes-picker">
+                  <button type="button" class="admin-size-chip active" data-size="P">P</button>
+                  <button type="button" class="admin-size-chip active" data-size="M">M</button>
+                  <button type="button" class="admin-size-chip active" data-size="G">G</button>
+                  <button type="button" class="admin-size-chip active" data-size="GG">GG</button>
+                  <button type="button" class="admin-size-chip" data-size="XGG">XGG</button>
+                  <button type="button" class="admin-size-chip" data-size="38">38</button>
+                  <button type="button" class="admin-size-chip" data-size="39">39</button>
+                  <button type="button" class="admin-size-chip" data-size="40">40</button>
+                  <button type="button" class="admin-size-chip" data-size="41">41</button>
+                  <button type="button" class="admin-size-chip" data-size="42">42</button>
+                  <button type="button" class="admin-size-chip" data-size="43">43</button>
+                  <button type="button" class="admin-size-chip" data-size="ÚNICO">ÚNICO</button>
+                </div>
+                <input type="hidden" id="prod-sizes" name="tamanhos" value="P,M,G,GG">
+              </div>
+
+              <!-- Descrição -->
+              <div class="form-group">
+                <label for="prod-desc" class="form-label">DESCRIÇÃO DA PEÇA</label>
+                <textarea 
+                  id="prod-desc" 
+                  name="descricao" 
+                  rows="3" 
+                  class="form-textarea" 
+                  placeholder="Modelagem boxy, algodão encorpado 300g, estética crua Palace."
+                ></textarea>
+              </div>
+
+              <!-- Botão Salvar -->
+              <div class="form-actions">
+                <button type="submit" class="btn-admin-submit" id="btn-save-product">
+                  CADASTRAR NO SUPABASE
+                </button>
+              </div>
+
+              <!-- Feedback -->
+              <div class="form-feedback" id="form-feedback"></div>
+
+            </form>
+          </section>
+
+          <!-- COLUNA 2: PRODUTOS NO BANCO & GERENCIAMENTO -->
+          <section class="admin-card" aria-labelledby="list-heading">
+            <div class="admin-card-header">
+              <div>
+                <h2 class="admin-card-title" id="list-heading">PRODUTOS NO BANCO</h2>
+                <span class="admin-counter" id="admin-counter">0 ITENS</span>
+              </div>
+              <button type="button" class="btn-seed-db" id="btn-seed-db" title="Inserir os 18 produtos iniciais de uma vez no Supabase">
+                SINCRONIZAR 18 PRODUTOS
+              </button>
+            </div>
+
+            <div class="admin-products-list" id="admin-products-list">
+              <div class="admin-loading">Carregando catálogo do Supabase...</div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           SEÇÃO 2: ABA DE CATEGORIAS (CRIAR, EDITAR, EXCLUIR)
+           ================================================================== -->
+      <div class="admin-tab-content" id="tab-categories">
+        <div class="admin-grid">
+          
+          <!-- COLUNA 1: FORMULÁRIO DE CATEGORIA (NOVA / EDITAR) -->
+          <section class="admin-card" aria-labelledby="cat-form-heading">
+            <div class="form-title-bar">
+              <h2 class="admin-card-title" id="cat-form-heading">+ NOVA CATEGORIA</h2>
+              <button type="button" class="btn-cancel-edit" id="btn-cancel-cat-edit" style="display: none;">
+                ✕ CANCELAR EDIÇÃO
+              </button>
+            </div>
+
+            <form id="category-form" class="admin-form">
+              <input type="hidden" id="edit-cat-id" value="">
+
+              <div class="form-group">
+                <label for="cat-name" class="form-label">NOME DA CATEGORIA *</label>
+                <input 
+                  type="text" 
+                  id="cat-name" 
+                  name="cat_nome" 
+                  class="form-input" 
+                  placeholder="EX: ACESSÓRIOS, JAQUETAS, SNEAKERS" 
+                  required 
+                  autocomplete="off"
+                >
+                <span class="form-hint">O slug será gerado automaticamente em minúsculas (ex: "acessorios").</span>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-admin-submit" id="btn-save-category">
+                  CADASTRAR CATEGORIA
+                </button>
+              </div>
+
+              <!-- Feedback Categoria -->
+              <div class="form-feedback" id="cat-form-feedback"></div>
+            </form>
+          </section>
+
+          <!-- COLUNA 2: LISTA DE CATEGORIAS -->
+          <section class="admin-card" aria-labelledby="cat-list-heading">
+            <div class="admin-card-header">
+              <div>
+                <h2 class="admin-card-title" id="cat-list-heading">CATEGORIAS ATIVAS</h2>
+                <span class="admin-counter" id="cat-counter">0 CATEGORIAS</span>
+              </div>
+            </div>
+
+            <div class="admin-categories-list" id="admin-categories-list">
+              <div class="admin-loading">Carregando categorias...</div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

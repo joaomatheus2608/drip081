@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WEBSHOP | DRIP081</title>
+  <meta name="description" content="Catálogo oficial de streetwear DRIP081. Sapatos, calças, bermudas, camisas, moletons e bonés com estética brutalista e minimalista.">
+  
+  <!-- Favicon: Isotipo (letra D estilizada) -->
+  <link rel="icon" type="image/png" href="assets/isotipo-black.png">
+  
+  <!-- CSS Principal -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="shop-page">
+
+  <!-- CABEÇALHO EM PÍLULA FLUTUANTE (Sublinhado na página atual) -->
+  <header class="pill-header" role="banner">
+    <a href="index.html" class="pill-brand" aria-label="DRIP081 Início">
+      <img src="assets/imagotipo-white.png" alt="DRIP081" class="pill-logo">
+    </a>
+    <nav class="pill-nav" aria-label="Navegação principal">
+      <a href="webshop.html" class="pill-link active" aria-current="page">WEBSHOP</a>
+    </nav>
+  </header>
+
+  <main role="main">
+    
+    <!-- LINHA DE CATEGORIAS CENTRALIZADA -->
+    <section class="category-nav-wrapper" aria-label="Filtro por categoria">
+      <nav class="category-nav" id="category-nav">
+        <button type="button" class="category-btn active" data-category="todos">TODOS</button>
+        <button type="button" class="category-btn" data-category="sapatos">SAPATOS</button>
+        <button type="button" class="category-btn" data-category="calcas">CALÇAS</button>
+        <button type="button" class="category-btn" data-category="bermudas">BERMUDAS</button>
+        <button type="button" class="category-btn" data-category="camisas">CAMISAS</button>
+        <button type="button" class="category-btn" data-category="moletons">MOLETONS</button>
+        <button type="button" class="category-btn" data-category="bones">BONÉS</button>
+      </nav>
+    </section>
+
+    <!-- META INFO / STATUS DA LOJA -->
+    <div class="shop-header-meta">
+      <span class="shop-status-text" id="shop-status-count">18 PRODUTOS</span>
+      <span class="shop-status-text">RECIFE / PE &mdash; DROP 01</span>
+    </div>
+
+    <!-- GRID DE PRODUTOS RESPONSIVO -->
+    <section class="products-container" aria-label="Catálogo de produtos">
+      <div class="products-grid" id="products-grid">
+        <!-- Renderizado dinamicamente via JS com transição em cascata -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTÃO FLUTUANTE FILTRAR FIXO EMBAIXO -->
+  <div class="floating-filter-bar">
+    <button type="button" class="btn-floating-filter" id="btn-floating-filter" aria-haspopup="dialog" aria-expanded="false">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="4" y1="21" x2="4" y2="14"></line>
+        <line x1="4" y1="10" x2="4" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12" y2="3"></line>
+        <line x1="20" y1="21" x2="20" y2="16"></line>
+        <line x1="20" y1="12" x2="20" y2="3"></line>
+        <line x1="1" y1="14" x2="7" y2="14"></line>
+        <line x1="9" y1="8" x2="15" y2="8"></line>
+        <line x1="17" y1="16" x2="23" y2="16"></line>
+      </svg>
+      FILTRAR
+    </button>
+  </div>
+
+  <!-- DRAWER / PAINEL DE FILTROS -->
+  <div class="filter-drawer-overlay" id="filter-drawer-overlay" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <div class="filter-drawer">
+      <div class="filter-drawer-header">
+        <h2 class="filter-drawer-title" id="drawer-title">FILTRAR &amp; ORDENAR</h2>
+        <button type="button" class="drawer-close-btn" id="drawer-close-btn" aria-label="Fechar painel de filtros">&times;</button>
+      </div>
+
+      <!-- Filtro de Categorias no Painel -->
+      <div class="filter-group">
+        <span class="filter-group-label">CATEGORIA</span>
+        <div class="filter-options-grid" id="drawer-category-options">
+          <button type="button" class="filter-pill-opt active" data-value="todos">TODOS</button>
+          <button type="button" class="filter-pill-opt" data-value="sapatos">SAPATOS</button>
+          <button type="button" class="filter-pill-opt" data-value="calcas">CALÇAS</button>
+          <button type="button" class="filter-pill-opt" data-value="bermudas">BERMUDAS</button>
+          <button type="button" class="filter-pill-opt" data-value="camisas">CAMISAS</button>
+          <button type="button" class="filter-pill-opt" data-value="moletons">MOLETONS</button>
+          <button type="button" class="filter-pill-opt" data-value="bones">BONÉS</button>
+        </div>
+      </div>
+
+      <!-- Ordenação por Preço / Alfabeto -->
+      <div class="filter-group">
+        <span class="filter-group-label">ORDENAR POR</span>
+        <div class="filter-options-grid" id="drawer-sort-options">
+          <button type="button" class="filter-pill-opt active" data-value="default">DESTAQUE</button>
+          <button type="button" class="filter-pill-opt" data-value="price-asc">MENOR PREÇO</button>
+          <button type="button" class="filter-pill-opt" data-value="price-desc">MAIOR PREÇO</button>
+          <button type="button" class="filter-pill-opt" data-value="name-asc">NOME A-Z</button>
+          <button type="button" class="filter-pill-opt" data-value="name-desc">NOME Z-A</button>
+        </div>
+      </div>
+
+      <!-- Ações do Drawer -->
+      <div class="drawer-actions">
+        <button type="button" class="btn-reset-filters" id="btn-reset-filters">LIMPAR</button>
+        <button type="button" class="btn-apply-filters" id="btn-apply-filters">APLICAR FILTROS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE DETALHES DO PRODUTO (MINIMALISTA) -->
+  <div class="modal-overlay" id="product-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-container">
+      <button type="button" class="modal-close-btn" id="modal-close-btn" aria-label="Fechar detalhes do produto">&times;</button>
+      
+      <!-- Galeria / Imagem Grande -->
+      <div class="modal-gallery">
+        <img src="" alt="" class="modal-main-img" id="modal-main-img">
+        <div class="modal-gallery-thumbs" id="modal-gallery-thumbs">
+          <!-- Miniaturas se houver imagem2 -->
+        </div>
+      </div>
+
+      <!-- Detalhes do Produto -->
+      <div class="modal-details">
+        <span class="modal-category-tag" id="modal-category-tag">CATEGORIA</span>
+        <h2 class="modal-title" id="modal-title">NOME DO PRODUTO</h2>
+        <div class="modal-price" id="modal-price">R$ 0,00</div>
+        <p class="modal-desc" id="modal-desc">Descrição do produto.</p>
+
+        <!-- Seletor de Tamanhos -->
+        <div class="modal-size-section">
+          <span class="modal-size-label">TAMANHO DISPONÍVEL</span>
+          <div class="modal-size-options" id="modal-size-options">
+            <!-- Botões de tamanho injetados via JS -->
+          </div>
+        </div>
+
+        <!-- Botão Comprar (Mock visual com feedback) -->
+        <button type="button" class="btn-modal-buy" id="btn-modal-buy">COMPRAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRIP081 | STREETWEAR RECIFE</title>
+  <meta name="description" content="DRIP081 - Streetwear masculino autêntico direto de Recife. Estética minimalista, crua e de alta atitude.">
+  
+  <!-- Favicon: Isotipo (letra D estilizada) -->
+  <link rel="icon" type="image/png" href="assets/isotipo-black.png">
+  
+  <!-- CSS Principal -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-hero-body">
+
+  <!-- CABEÇALHO EM PÍLULA FLUTUANTE -->
+  <header class="pill-header" role="banner">
+    <a href="index.html" class="pill-brand" aria-label="DRIP081 Início">
+      <img src="assets/imagotipo-white.png" alt="DRIP081" class="pill-logo">
+    </a>
+    <nav class="pill-nav" aria-label="Navegação principal">
+      <a href="webshop.html" class="pill-link">WEBSHOP</a>
+    </nav>
+  </header>
+
+  <!-- HERO SECTION EM TELA CHEIA (100vh com margem de 12px e cantos arredondados) -->
+  <main class="hero-wrapper" role="main">
+    <section class="hero-stage" aria-label="Apresentação DRIP081">
+      
+      <!-- Imagem de fundo original (sem escurecer, cor natural enviada pelo usuário) -->
+      <div class="hero-media" aria-hidden="true">
+        <img 
+          src="assets/hero.jpg" 
+          alt="DRIP081 Streetwear" 
+          class="hero-img"
+          loading="eager"
+        >
+      </div>
+
+      <!-- Conteúdo interativo do Hero -->
+      <div class="hero-content">
+        
+        <!-- Lista vertical de produtos/categorias à esquerda em loop contínuo lento e minimalista -->
+        <div class="hero-ticker-panel">
+          <div class="hero-ticker-viewport" aria-live="off" aria-label="Produtos DRIP081">
+            <div class="hero-ticker-track" id="hero-ticker-track">
+              <!-- Preenchido dinamicamente via JS em loop contínuo infinito -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão no meio da lateral direita: VER COLEÇÃO -->
+        <div class="hero-action">
+          <a href="webshop.html" class="btn-hero-cta">VER COLEÇÃO</a>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/products.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
