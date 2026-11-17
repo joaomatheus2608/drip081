@@ -1,7 +1,6 @@
 -- ==========================================================================
 -- DRIP081 // SUPABASE SQL SETUP COMPLETO (PRODUTOS & CATEGORIAS)
 -- Cole este script no SQL Editor do seu projeto Supabase e clique em RUN.
--- Projeto: https://fysmydnbpmtxheyvpkmi.supabase.co
 -- ==========================================================================
 
 -- --------------------------------------------------------------------------

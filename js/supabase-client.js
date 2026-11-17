@@ -1,11 +1,11 @@
 /**
  * DRIP081 - Cliente de Integração com o Supabase
- * Gerencia a comunicação em tempo real com o banco de dados PostgreSQL do Supabase.
- * Suporta tanto as credenciais locais quanto Environment Variables da Vercel (/api/config).
+ * As credenciais são carregadas dinamicamente via /api/config a partir das
+ * Environment Variables seguras da Vercel (SUPABASE_URL e SUPABASE_KEY).
  */
 
-let SUPABASE_URL = "https://fysmydnbpmtxheyvpkmi.supabase.co";
-let SUPABASE_KEY = "sb_publishable_r5BEVBjWaCi7z68plQn2HQ_scSiAEoc";
+let SUPABASE_URL = "";
+let SUPABASE_KEY = "";
 
 let supabaseClient = null;
 let initPromise = null;
